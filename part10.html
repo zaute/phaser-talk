@@ -21,7 +21,7 @@
   </head>
   <body>
     <script type="text/javascript">
-      // Part 9 - rotate player when jumping
+      // Part 10 - Introdice rest of the sprites. Platforms to land on
       const canvasWidth = 1200;
       const canvasHeight = 600;
 
@@ -82,15 +82,65 @@
 
         // Static groups
         this.pyramids = this.physics.add.staticGroup();
+        this.platforms = this.physics.add.staticGroup();
+        this.hazards = this.physics.add.staticGroup();
+        this.squares = this.physics.add.staticGroup();
 
         // Params
         let index = 800; // start index for first hazard
         const groundLevel = canvasHeight - 125; // ground level
+        const groundLevelTiny = canvasHeight - 115; // ground level tiny objects
+        const platformSpace = 250; // distance between platforms for perfect jump
 
         // Hazard - pyramids
         this.pyramids.create(index, groundLevel, "pyramid-up");
         this.pyramids.create(index + 400, groundLevel, "pyramid-up");
         this.pyramids.create(index + 800, groundLevel, "pyramid-up");
+
+        // Hazard - platforms and stuff
+        // Add platforms as static physics objects
+        index = 2000;
+        const platformCoords = [
+          { x: index, y: groundLevel - 50 },
+          { x: index + platformSpace, y: groundLevel - 100 },
+          { x: index + platformSpace * 2, y: groundLevel - 150 },
+          { x: index + platformSpace * 3, y: groundLevel - 200 },
+          { x: index + platformSpace * 4, y: groundLevel - 250 },
+        ];
+        platformCoords.forEach((pos) => {
+          this.platforms.create(pos.x, pos.y, "platform");
+        });
+
+        // Add hazards as static physics objects
+        const hazardCoords = [
+          { x: index, y: groundLevelTiny },
+          { x: index + 50, y: groundLevelTiny },
+          { x: index + 100, y: groundLevelTiny },
+          { x: index + 150, y: groundLevelTiny },
+          { x: index + 200, y: groundLevelTiny },
+          { x: index + 250, y: groundLevelTiny },
+          { x: index + 300, y: groundLevelTiny },
+          { x: index + 350, y: groundLevelTiny },
+          { x: index + 400, y: groundLevelTiny },
+          { x: index + 450, y: groundLevelTiny },
+          { x: index + 500, y: groundLevelTiny },
+          { x: index + 550, y: groundLevelTiny },
+          { x: index + 600, y: groundLevelTiny },
+          { x: index + 650, y: groundLevelTiny },
+          { x: index + 700, y: groundLevelTiny },
+          { x: index + 750, y: groundLevelTiny },
+          { x: index + 800, y: groundLevelTiny },
+          { x: index + 850, y: groundLevelTiny },
+          { x: index + 900, y: groundLevelTiny },
+          { x: index + 950, y: groundLevelTiny },
+          { x: index + +1000, y: groundLevelTiny },
+          { x: index + 1050, y: groundLevelTiny },
+          { x: index + 1100, y: groundLevelTiny },
+          { x: index + 1150, y: groundLevelTiny },
+        ];
+        hazardCoords.forEach((pos) => {
+          this.hazards.create(pos.x, pos.y, "hazard");
+        });
 
         // Set up camera and world
         this.cameras.main.setBounds(0, 0, worldWidth, canvasHeight); // World is 21000px wide
@@ -98,7 +148,7 @@
 
         this.scrollSpeed = 10; // pixels per frame
 
-        // Pyramid collisions
+        // Collision detection
         this.physics.add.collider(
           this.player,
           this.pyramids,
@@ -106,6 +156,15 @@
           null,
           this
         );
+        this.physics.add.collider(
+          this.player,
+          this.hazards,
+          handleCrash,
+          null,
+          this
+        );
+        this.physics.add.collider(this.player, this.platforms);
+        this.physics.add.collider(this.player, this.squares);
 
         function handleCrash() {
           this.scene.restart();

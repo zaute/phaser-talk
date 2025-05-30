@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Phaser talk - Part 9</title>
+    <script src="js/phaser.js"></script>
+    <style type="text/css">
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #000;
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      // Part 11 - This gets really messy ....
+      const canvasWidth = 1200;
+      const canvasHeight = 600;
+
+      var config = {
+        type: Phaser.AUTO,
+        width: canvasWidth,
+        height: canvasHeight,
+        physics: {
+          default: "arcade",
+          arcade: {
+            gravity: { y: 5000 }, // or some value if you want gravity
+            debug: false,
+          },
+        },
+        scene: {
+          preload: preload,
+          create: create,
+          update: update,
+        },
+      };
+
+      var game = new Phaser.Game(config);
+
+      function preload() {
+        this.load.image("sky", "assets/sky.png");
+        this.load.image("ground", "assets/ground.png");
+        this.load.image("player", "assets/player.png");
+        this.load.image("pyramid-up", "assets/pyramid-up.png");
+        this.load.image("square", "assets/square.png");
+        this.load.image("platform", "assets/platform.png");
+        this.load.image("hazard", "assets/hazard.png");
+      }
+
+      function create() {
+        const worldWidth = 21000;
+
+        // Background
+        const bg = this.add.image(0, 0, "sky").setOrigin(0, 0);
+        bg.setDisplaySize(worldWidth, this.sys.game.config.height);
+
+        // Ground (physics-enabled)
+        this.ground = this.physics.add.staticImage(0, 500, "ground");
+        this.ground.displayWidth = worldWidth;
+        this.ground.displayHeight = 100;
+        this.ground.setOrigin(0, 0);
+        this.ground.refreshBody();
+
+        // Player
+        this.player = this.physics.add.sprite(100, 350, "player");
+        this.player.setBounce(0.1);
+        this.player.setCollideWorldBounds(true);
+
+        // Have player collide with ground
+        this.physics.add.collider(this.player, this.ground);
+
+        // Enable keyboard input
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        // Static groups
+        this.pyramids = this.physics.add.staticGroup();
+        this.platforms = this.physics.add.staticGroup();
+        this.hazards = this.physics.add.staticGroup();
+        this.squares = this.physics.add.staticGroup();
+
+        // Params
+        let index = 800; // start index for first hazard
+        const groundLevel = canvasHeight - 125; // ground level
+        const groundLevelTiny = canvasHeight - 115; // ground level tiny objects
+        const platformSpace = 250; // distance between platforms for perfect jump
+        const spriteWidthAndHeight = 50; // all sprites are 50px
+
+        // Static groups
+        this.platforms = this.physics.add.staticGroup();
+        this.pyramids = this.physics.add.staticGroup();
+        this.hazards = this.physics.add.staticGroup();
+        this.squares = this.physics.add.staticGroup();
+
+        // Hazard - one pyramid
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+
+        // Hazard - two pyramids
+        index = 2000;
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(
+          index + spriteWidthAndHeight,
+          groundLevel,
+          "pyramid-up"
+        );
+
+        // Hazard - three pyramids
+        index = 3000;
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(
+          index + spriteWidthAndHeight,
+          groundLevel,
+          "pyramid-up"
+        );
+        this.pyramids.create(
+          index + 2 * spriteWidthAndHeight,
+          groundLevel,
+          "pyramid-up"
+        );
+
+        // Hazard - two pyramids
+        index = 4000;
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(
+          index + spriteWidthAndHeight,
+          groundLevel,
+          "pyramid-up"
+        );
+
+        // Hazard - two pyramids
+        index = 4500;
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(
+          index + spriteWidthAndHeight,
+          groundLevel,
+          "pyramid-up"
+        );
+
+        // Hazard - two pyramids
+        index = 5000;
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(
+          index + spriteWidthAndHeight,
+          groundLevel,
+          "pyramid-up"
+        );
+
+        // Hazard - two pyramids
+        index = 5500;
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(
+          index + spriteWidthAndHeight,
+          groundLevel,
+          "pyramid-up"
+        );
+
+        // Hazard - platforms and stuff
+        // Add platforms as static physics objects
+        index = 6000;
+        const platformCoords = [
+          { x: index, y: groundLevel - 50 },
+          { x: index + platformSpace, y: groundLevel - 100 },
+          { x: index + platformSpace * 2, y: groundLevel - 150 },
+          { x: index + platformSpace * 3, y: groundLevel - 200 },
+          { x: index + platformSpace * 4, y: groundLevel - 250 },
+        ];
+        platformCoords.forEach((pos) => {
+          this.platforms.create(pos.x, pos.y, "platform");
+        });
+
+        // Add hazards as static physics objects
+        const hazardCoords = [
+          { x: index, y: groundLevelTiny },
+          { x: index + 50, y: groundLevelTiny },
+          { x: index + 100, y: groundLevelTiny },
+          { x: index + 150, y: groundLevelTiny },
+          { x: index + 200, y: groundLevelTiny },
+          { x: index + 250, y: groundLevelTiny },
+          { x: index + 300, y: groundLevelTiny },
+          { x: index + 350, y: groundLevelTiny },
+          { x: index + 400, y: groundLevelTiny },
+          { x: index + 450, y: groundLevelTiny },
+          { x: index + 500, y: groundLevelTiny },
+          { x: index + 550, y: groundLevelTiny },
+          { x: index + 600, y: groundLevelTiny },
+          { x: index + 650, y: groundLevelTiny },
+          { x: index + 700, y: groundLevelTiny },
+          { x: index + 750, y: groundLevelTiny },
+          { x: index + 800, y: groundLevelTiny },
+          { x: index + 850, y: groundLevelTiny },
+          { x: index + 900, y: groundLevelTiny },
+          { x: index + 950, y: groundLevelTiny },
+          { x: index + +1000, y: groundLevelTiny },
+          { x: index + 1050, y: groundLevelTiny },
+          { x: index + 1100, y: groundLevelTiny },
+          { x: index + 1150, y: groundLevelTiny },
+        ];
+        hazardCoords.forEach((pos) => {
+          this.hazards.create(pos.x, pos.y, "hazard");
+        });
+
+        // Hazard - squares and pyramids and stuff
+        index = 8000;
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(index + 50, groundLevel, "pyramid-up");
+        this.squares.create(index + 100, groundLevel, "square");
+
+        this.hazards.create(index + 150, groundLevelTiny, "hazard");
+        this.hazards.create(index + 200, groundLevelTiny, "hazard");
+        this.hazards.create(index + 250, groundLevelTiny, "hazard");
+        this.hazards.create(index + 300, groundLevelTiny, "hazard");
+
+        this.squares.create(index + platformSpace + 100, groundLevel, "square");
+        this.squares.create(
+          index + platformSpace + 100,
+          groundLevel - 50,
+          "square"
+        );
+
+        this.hazards.create(
+          index + platformSpace + 150,
+          groundLevelTiny,
+          "hazard"
+        );
+        this.hazards.create(
+          index + platformSpace + 200,
+          groundLevelTiny,
+          "hazard"
+        );
+        this.hazards.create(
+          index + platformSpace + 250,
+          groundLevelTiny,
+          "hazard"
+        );
+        this.hazards.create(
+          index + platformSpace + 300,
+          groundLevelTiny,
+          "hazard"
+        );
+
+        this.squares.create(
+          index + platformSpace * 2 + 100,
+          groundLevel,
+          "square"
+        );
+        this.squares.create(
+          index + platformSpace * 2 + 100,
+          groundLevel - 50,
+          "square"
+        );
+        this.squares.create(
+          index + platformSpace * 2 + 100,
+          groundLevel - 100,
+          "square"
+        );
+
+        // Set up camera and world
+        this.cameras.main.setBounds(0, 0, worldWidth, canvasHeight); // World is 21000px wide
+        this.physics.world.setBounds(0, 0, worldWidth, canvasHeight);
+
+        this.scrollSpeed = 10; // pixels per frame
+
+        // Collision detection
+        this.physics.add.collider(
+          this.player,
+          this.pyramids,
+          handleCrash,
+          null,
+          this
+        );
+        this.physics.add.collider(
+          this.player,
+          this.hazards,
+          handleCrash,
+          null,
+          this
+        );
+        this.physics.add.collider(this.player, this.platforms);
+        this.physics.add.collider(this.player, this.squares);
+
+        function handleCrash() {
+          this.scene.restart();
+        }
+      }
+
+      function update() {
+        // Jump awhen space is pressed and player is on ground
+        if (this.cursors.space.isDown && this.player.body.blocked.down) {
+          this.player.setVelocityY(-1200);
+
+          this.tweens.add({
+            targets: this.player,
+            angle: this.player.angle + 90, // totation
+            duration: 300, // in ms
+            ease: "Linear", // Bounce, Elastic
+          });
+        }
+
+        // Scroll
+        this.cameras.main.scrollX += this.scrollSpeed;
+
+        // Keep player fixed on screen (100px from left)
+        this.player.x = this.cameras.main.scrollX + 100;
+      }
+    </script>
+  </body>
+</html>

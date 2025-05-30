@@ -21,6 +21,7 @@
   </head>
   <body>
     <script type="text/javascript">
+      // Part 7 - introduce more hazards and start scrolling
       const canvasWidth = 1200;
       const canvasHeight = 600;
 
@@ -86,7 +87,7 @@
         let index = 800; // start index for first hazard
         const groundLevel = canvasHeight - 125; // ground level
 
-        // Hazard - one pyramid
+        // Hazard - pyramids
         this.pyramids.create(index, groundLevel, "pyramid-up");
         this.pyramids.create(index + 400, groundLevel, "pyramid-up");
         this.pyramids.create(index + 800, groundLevel, "pyramid-up");
