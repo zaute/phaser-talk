@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Phaser talk - Part 9</title>
+    <script src="js/phaser.js"></script>
+    <style type="text/css">
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #000;
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      const canvasWidth = 1200;
+      const canvasHeight = 600;
+
+      var config = {
+        type: Phaser.AUTO,
+        width: canvasWidth,
+        height: canvasHeight,
+        physics: {
+          default: "arcade",
+          arcade: {
+            gravity: { y: 5000 }, // or some value if you want gravity
+            debug: false,
+          },
+        },
+        scene: {
+          preload: preload,
+          create: create,
+          update: update,
+        },
+      };
+
+      var game = new Phaser.Game(config);
+
+      function preload() {
+        this.load.image("sky", "assets/sky.png");
+        this.load.image("ground", "assets/ground.png");
+        this.load.image("player", "assets/player.png");
+        this.load.image("pyramid-up", "assets/pyramid-up.png");
+        this.load.image("square", "assets/square.png");
+        this.load.image("platform", "assets/platform.png");
+        this.load.image("hazard", "assets/hazard.png");
+      }
+
+      function create() {
+        const worldWidth = 21000;
+
+        // Background
+        const bg = this.add.image(0, 0, "sky").setOrigin(0, 0);
+        bg.setDisplaySize(worldWidth, this.sys.game.config.height);
+
+        // Ground (physics-enabled)
+        this.ground = this.physics.add.staticImage(0, 500, "ground");
+        this.ground.displayWidth = worldWidth;
+        this.ground.displayHeight = 100;
+        this.ground.setOrigin(0, 0);
+        this.ground.refreshBody();
+
+        // Player
+        this.player = this.physics.add.sprite(100, 350, "player");
+        this.player.setBounce(0.1);
+        this.player.setCollideWorldBounds(true);
+
+        // Have player collide with ground
+        this.physics.add.collider(this.player, this.ground);
+
+        // Enable keyboard input
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        // Static groups
+        this.pyramids = this.physics.add.staticGroup();
+
+        // Params
+        let index = 800; // start index for first hazard
+        const groundLevel = canvasHeight - 125; // ground level
+
+        // Hazard - one pyramid
+        this.pyramids.create(index, groundLevel, "pyramid-up");
+        this.pyramids.create(index + 400, groundLevel, "pyramid-up");
+        this.pyramids.create(index + 800, groundLevel, "pyramid-up");
+
+        // Set up camera and world
+        this.cameras.main.setBounds(0, 0, worldWidth, canvasHeight); // World is 21000px wide
+        this.physics.world.setBounds(0, 0, worldWidth, canvasHeight);
+
+        this.scrollSpeed = 10; // pixels per frame
+
+        // Pyramid collisions
+        this.physics.add.collider(
+          this.player,
+          this.pyramids,
+          handleCrash,
+          null,
+          this
+        );
+
+        function handleCrash() {
+          this.scene.restart();
+        }
+      }
+
+      function update() {
+        // Jump awhen space is pressed and player is on ground
+        if (this.cursors.space.isDown && this.player.body.blocked.down) {
+          this.player.setVelocityY(-1200);
+
+          this.tweens.add({
+            targets: this.player,
+            angle: this.player.angle + 90, // totation
+            duration: 300, // in ms
+            ease: "Linear", // Bounce, Elastic
+          });
+        }
+
+        // Scroll
+        this.cameras.main.scrollX += this.scrollSpeed;
+
+        // Keep player fixed on screen (100px from left)
+        this.player.x = this.cameras.main.scrollX + 100;
+      }
+    </script>
+  </body>
+</html>
