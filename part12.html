@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Phaser talk - Part 9</title>
+    <script src="js/phaser.js"></script>
+    <style type="text/css">
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #000;
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      // Part 12 - Introducing tiles and tilemaps
+      const canvasWidth = 1200;
+      const canvasHeight = 600;
+
+      var config = {
+        type: Phaser.AUTO,
+        width: canvasWidth,
+        height: canvasHeight,
+        physics: {
+          default: "arcade",
+          arcade: {
+            gravity: { y: 5000 }, // or some value if you want gravity
+            debug: false,
+          },
+        },
+        scene: {
+          preload: preload,
+          create: create,
+          update: update,
+        },
+      };
+
+      var game = new Phaser.Game(config);
+
+      function preload() {
+        this.load.image("sky", "assets/sky.png");
+        this.load.image("ground", "assets/ground.png");
+        this.load.image("player", "assets/player.png");
+        this.load.tilemapTiledJSON("map", "tiled/test.tmj");
+        this.load.image("tiles", "assets/tileset.png");
+      }
+
+      function create() {
+        const worldWidth = 21000;
+
+        // Background
+        const bg = this.add.image(0, 0, "sky").setOrigin(0, 0);
+        bg.setDisplaySize(worldWidth, this.sys.game.config.height);
+
+        // Ground (physics-enabled)
+        this.ground = this.physics.add.staticImage(0, 500, "ground");
+        this.ground.displayWidth = worldWidth;
+        this.ground.displayHeight = 100;
+        this.ground.setOrigin(0, 0);
+        this.ground.refreshBody();
+
+        // Player
+        this.player = this.physics.add.sprite(100, 350, "player");
+        this.player.setBounce(0.1);
+        this.player.setCollideWorldBounds(true);
+
+        // Have player collide with ground
+        this.physics.add.collider(this.player, this.ground);
+
+        // Enable keyboard input
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        // Set up camera and world
+        this.cameras.main.setBounds(0, 0, worldWidth, canvasHeight); // World is 21000px wide
+        this.physics.world.setBounds(0, 0, worldWidth, canvasHeight);
+
+        this.scrollSpeed = 10; // pixels per frame
+
+        const map = this.make.tilemap({ key: "map" });
+        const tileset = map.addTilesetImage("tileset", "tiles");
+        this.layer = map.createStaticLayer("TileLayer1", tileset, 0, 0);
+
+        // tiles with these indexes collide safely
+        this.layer.setCollision([1, 2, 3, 4, 5, 6, 9, 10]);
+        this.physics.add.collider(this.player, this.layer);
+
+        // these tiles will kill ya
+        this.deadlyTileIndexes = [7, 8, 11];
+
+        // goal!
+        this.goalTileIndex = [12];
+      }
+
+      function update() {
+        // Jump awhen space is pressed and player is on ground
+        if (this.cursors.space.isDown && this.player.body.blocked.down) {
+          this.player.setVelocityY(-1200);
+
+          this.tweens.add({
+            targets: this.player,
+            angle: this.player.angle + 90, // totation
+            duration: 300, // in ms
+            ease: "Linear", // Bounce, Elastic
+          });
+        }
+
+        // Scroll
+        this.cameras.main.scrollX += this.scrollSpeed;
+
+        // Keep player fixed on screen (100px from left)
+        this.player.x = this.cameras.main.scrollX + 100;
+
+        // Get the tile the player is standing on
+        const tile = this.layer.getTileAtWorldXY(
+          this.player.x,
+          this.player.y + this.player.height / 2 - 1,
+          true
+        );
+
+        // Crash and die
+        if (tile && this.deadlyTileIndexes.includes(tile.index)) {
+          this.scene.restart();
+        }
+
+        // Goal!!
+        if (tile && this.goalTileIndex.includes(tile.index)) {
+          this.physics.pause(); // stop all physics, including player
+          this.scrollSpeed = 0; // stop camera scrolling
+          this.player.destroy();
+        }
+      }
+    </script>
+  </body>
+</html>

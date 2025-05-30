@@ -93,12 +93,6 @@
         const platformSpace = 250; // distance between platforms for perfect jump
         const spriteWidthAndHeight = 50; // all sprites are 50px
 
-        // Static groups
-        this.platforms = this.physics.add.staticGroup();
-        this.pyramids = this.physics.add.staticGroup();
-        this.hazards = this.physics.add.staticGroup();
-        this.squares = this.physics.add.staticGroup();
-
         // Hazard - one pyramid
         this.pyramids.create(index, groundLevel, "pyramid-up");
 
