@@ -151,6 +151,7 @@
           // hide player
           this.player.disableBody(true, true);
 
+          // explode with style
           const numPieces = 20;
           for (let i = 0; i < numPieces; i++) {
             const piece = this.physics.add.sprite(
@@ -159,9 +160,6 @@
               "player"
             );
             piece.setScale(0.3);
-            piece.setBounce(0.6);
-            piece.setCollideWorldBounds(true);
-            piece.body.setGravityY(10);
 
             // Random velocity more to the right and upward
             const angle = Phaser.Math.Between(270, 315); // up-right
