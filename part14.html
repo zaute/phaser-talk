@@ -108,13 +108,13 @@
       }
 
       function update() {
-        // Jump awhen space is pressed and player is on ground
+        // Jump when space is pressed and player is on ground
         if (this.cursors.space.isDown && this.player.body.blocked.down) {
           this.player.setVelocityY(-1200);
 
           this.tweens.add({
             targets: this.player,
-            angle: this.player.angle + 90, // totation
+            angle: this.player.angle + 90, // rotation
             duration: 300, // in ms
             ease: "Linear", // Bounce, Elastic
           });
@@ -147,10 +147,10 @@
           }
           this.sound.play("crash", { volume: 0.2 });
 
-          // hide player
+          // Hide player
           this.player.disableBody(true, true);
 
-          // explode with style
+          // Explode with style
           const numPieces = 20;
           for (let i = 0; i < numPieces; i++) {
             const piece = this.physics.add.sprite(
