@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Phaser talk - Part 2</title>
+    <title>
+      Phaser talk - Part 2 - Constants and physics. And CSS to center
+    </title>
     <script src="js/phaser.js"></script>
     <style type="text/css">
       body {
@@ -21,7 +23,6 @@
   </head>
   <body>
     <script type="text/javascript">
-      // Part 1 - constants and physics. And CSS to center
       const canvasWidth = 1200;
       const canvasHeight = 600;
 
@@ -32,7 +33,7 @@
         physics: {
           default: "arcade",
           arcade: {
-            gravity: { y: 5000 }, // or some value if you want gravity
+            gravity: { y: 5000 },
             debug: false,
           },
         },

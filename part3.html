@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Phaser talk - Part 3</title>
+    <title>Phaser talk - Part 3 - background and ground</title>
     <script src="js/phaser.js"></script>
     <style type="text/css">
       body {
@@ -21,7 +21,6 @@
   </head>
   <body>
     <script type="text/javascript">
-      // Part 1 - background and ground
       const canvasWidth = 1200;
       const canvasHeight = 600;
 
@@ -32,7 +31,7 @@
         physics: {
           default: "arcade",
           arcade: {
-            gravity: { y: 5000 }, // or some value if you want gravity
+            gravity: { y: 5000 },
             debug: false,
           },
         },

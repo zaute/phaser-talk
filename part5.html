@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Phaser talk - Part 5</title>
+    <title>Phaser talk - Part 5 - Make player jump</title>
     <script src="js/phaser.js"></script>
     <style type="text/css">
       body {
@@ -21,7 +21,6 @@
   </head>
   <body>
     <script type="text/javascript">
-      // Make player jump
       const canvasWidth = 1200;
       const canvasHeight = 600;
 
@@ -32,7 +31,7 @@
         physics: {
           default: "arcade",
           arcade: {
-            gravity: { y: 5000 }, // or some value if you want gravity
+            gravity: { y: 5000 },
             debug: false,
           },
         },

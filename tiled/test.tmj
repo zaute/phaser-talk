@@ -68,6 +68,15 @@
                          "type":"bool",
                          "value":true
                         }]
+                },
+                {
+                 "id":11,
+                 "properties":[
+                        {
+                         "name":"goal",
+                         "type":"bool",
+                         "value":true
+                        }]
                 }],
          "tilewidth":50,
          "transparentcolor":"#ff00ff"
